@@ -57,3 +57,6 @@ Thumbs.db
 # Raw files
 raw/
 video_parts/raw/
+
+# startup script
+run_weather.sh

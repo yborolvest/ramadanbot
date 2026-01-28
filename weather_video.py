@@ -51,6 +51,8 @@ BACKGROUND_DIR = os.path.join(BASE_DIR, "video_parts", "backgrounds")
 ICONS_DIR = os.path.join(BASE_DIR, "video_parts", "icons", "256w")  # Weather icons (256w PNG files)
 AVATAR_IMAGE = os.path.join(BASE_DIR, "avatar.png")  # optional, if present
 EXTRA_TAIL_SECONDS = 5.0  # extra background-only time after voice ends
+# Fonts directory
+FONT_DIR = os.path.join(BASE_DIR, "fonts")
 
 # Font configuration
 NORMAL_TEXT_FONT_SIZE = 40  # Font size for normal text (subtitles)
@@ -1270,9 +1272,9 @@ def create_slide(city, temp_c, condition_text, mood_text, out_file="slide.png"):
     draw = ImageDraw.Draw(img)
 
     try:
-        # You can drop any .ttf into the project and reference it here
-        font_big = ImageFont.truetype("Arial.ttf", 90)
-        font_medium = ImageFont.truetype("Arial.ttf", 60)
+        # Load fonts from the local fonts directory
+        font_big = ImageFont.truetype(os.path.join(FONT_DIR, "Arial-Bold.ttf"), 90)
+        font_medium = ImageFont.truetype(os.path.join(FONT_DIR, "Arial.ttf"), 60)
     except IOError:
         font_big = ImageFont.load_default()
         font_medium = ImageFont.load_default()
@@ -1496,7 +1498,7 @@ def create_video(slide_img, voice_file, music_file, forecast_text, temp_c, condi
 
             # Load a font for normal text (subtitles)
             try:
-                font = ImageFont.truetype("Arial.ttf", NORMAL_TEXT_FONT_SIZE)
+                font = ImageFont.truetype(os.path.join(FONT_DIR, "Arial.ttf"), NORMAL_TEXT_FONT_SIZE)
             except IOError:
                 font = ImageFont.load_default()
 
@@ -1687,14 +1689,14 @@ def create_video(slide_img, voice_file, music_file, forecast_text, temp_c, condi
         # Temperature text (larger)
         temp_label = f"{int(temp_c)}°C"
         try:
-            temp_font = ImageFont.truetype("Arial.ttf", TEMPERATURE_TEXT_FONT_SIZE)
+            temp_font = ImageFont.truetype(os.path.join(FONT_DIR, "Arial-Bold.ttf"), TEMPERATURE_TEXT_FONT_SIZE)
         except IOError:
             temp_font = ImageFont.load_default()
         
         # City name (larger)
         city_label = CITY
         try:
-            city_font = ImageFont.truetype("Arial.ttf", 64)
+            city_font = ImageFont.truetype(os.path.join(FONT_DIR, "Arial.ttf"), 64)
         except IOError:
             city_font = ImageFont.load_default()
         
@@ -1896,14 +1898,14 @@ def create_video(slide_img, voice_file, music_file, forecast_text, temp_c, condi
             # Forecast temperature text
             forecast_temp_label = f"{int(forecast_temp)}°C"
             try:
-                forecast_temp_font = ImageFont.truetype("Arial.ttf", 80)
+                forecast_temp_font = ImageFont.truetype(os.path.join(FONT_DIR, "Arial-Bold.ttf"), 80)
             except IOError:
                 forecast_temp_font = ImageFont.load_default()
             
             # Forecast label
             forecast_label_text = "Voorspelling"
             try:
-                forecast_label_font = ImageFont.truetype("Arial.ttf", 40)
+                forecast_label_font = ImageFont.truetype(os.path.join(FONT_DIR, "Arial.ttf"), 40)
             except IOError:
                 forecast_label_font = ImageFont.load_default()
             
