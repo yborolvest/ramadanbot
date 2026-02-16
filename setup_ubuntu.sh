@@ -117,19 +117,48 @@ SERVICE_FILE="$USER_SYSTEMD_DIR/$SERVICE_NAME.service"
 
 echo "    Installed $SERVICE_FILE"
 
-# --- 6. Enable and start ---
+# --- 6. Enable and start (user or system-wide) ---
 echo "[6/6] Enabling and starting scheduler..."
-systemctl --user daemon-reload
-systemctl --user enable "$SERVICE_NAME.service"
-systemctl --user start "$SERVICE_NAME.service"
-echo "    Service enabled and started."
+USE_SYSTEM_SERVICE=""
+if systemctl --user daemon-reload 2>/dev/null; then
+  if systemctl --user enable "$SERVICE_NAME.service" 2>/dev/null && systemctl --user start "$SERVICE_NAME.service" 2>/dev/null; then
+    echo "    Service enabled and started (user session)."
+  else
+    USE_SYSTEM_SERVICE=1
+  fi
+else
+  USE_SYSTEM_SERVICE=1
+fi
+
+if [[ -n "$USE_SYSTEM_SERVICE" ]]; then
+  echo "    User session not available (e.g. SSH/headless). Installing system-wide..."
+  SYSTEM_SERVICE="/etc/systemd/system/$SERVICE_NAME.service"
+  if command -v sudo &>/dev/null; then
+    sudo cp "$SERVICE_FILE" "$SYSTEM_SERVICE"
+    sudo systemctl daemon-reload
+    sudo systemctl enable "$SERVICE_NAME.service"
+    sudo systemctl start "$SERVICE_NAME.service"
+    echo "    Service enabled and started (system-wide)."
+  else
+    echo "    Could not enable service (no user bus and no sudo). Run manually:"
+    echo "      nohup $VENV_DIR/bin/python $PROJECT_DIR/ramadan_scheduler.py >> $PROJECT_DIR/ramadan_scheduler.log 2>&1 &"
+    echo "    Or copy $SERVICE_FILE to /etc/systemd/system/ and run: systemctl enable --now $SERVICE_NAME"
+  fi
+fi
 
 echo ""
 echo "=== Setup complete ==="
-echo "  Status:  systemctl --user status $SERVICE_NAME"
-echo "  Logs:    journalctl --user -u $SERVICE_NAME -f"
-echo "  Stop:    systemctl --user stop $SERVICE_NAME"
-echo "  Disable: systemctl --user disable $SERVICE_NAME"
+if systemctl --user status "$SERVICE_NAME" &>/dev/null; then
+  echo "  Status:  systemctl --user status $SERVICE_NAME"
+  echo "  Logs:    journalctl --user -u $SERVICE_NAME -f"
+  echo "  Stop:    systemctl --user stop $SERVICE_NAME"
+elif sudo systemctl status "$SERVICE_NAME" &>/dev/null 2>&1; then
+  echo "  Status:  sudo systemctl status $SERVICE_NAME"
+  echo "  Logs:    sudo journalctl -u $SERVICE_NAME -f"
+  echo "  Stop:    sudo systemctl stop $SERVICE_NAME"
+else
+  echo "  Run:     nohup $VENV_DIR/bin/python $PROJECT_DIR/ramadan_scheduler.py >> $PROJECT_DIR/ramadan_scheduler.log 2>&1 &"
+fi
 echo ""
 echo "The scheduler will run at sunrise and sundown for the duration of Ramadan."
-echo "Edit $ENV_FILE to change Discord webhook or location."
+[[ -f "$ENV_FILE" ]] && echo "Edit $ENV_FILE to change Discord webhook or location."

@@ -133,6 +133,8 @@ systemctl --user stop ramadan-scheduler
 systemctl --user disable ramadan-scheduler
 ```
 
+**If you see "Failed to connect to bus: No medium found"** (headless/SSH): the setup script falls back to a **system-wide** service. It will copy the unit to `/etc/systemd/system/` and use `sudo systemctl enable --now ramadan-scheduler`. Then use `sudo systemctl status ramadan-scheduler` and `sudo journalctl -u ramadan-scheduler -f`.
+
 ---
 
 ### Alternative: run in background (no systemd)
