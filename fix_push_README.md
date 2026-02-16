@@ -1,5 +1,17 @@
 # Fix "400" when pushing to a new repo
 
+## 0. Increase Git HTTP buffer (do this first)
+
+The "unexpected disconnect" / HTTP 400 often happens when the push is larger than Git’s default buffer:
+
+```bash
+git config http.postBuffer 524288000
+```
+
+Then try again: `git push -u ramadanbot main`
+
+---
+
 ## 1. Stop tracking large/generated files (so they aren’t pushed)
 
 Run in the project folder:
