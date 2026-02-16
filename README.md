@@ -98,6 +98,49 @@ To disable Discord posting:
 python3 weather_video.py --no-discord
 ```
 
+---
+
+## Ramadan version
+
+A Ramadan variant generates a daily video with a **random Quran verse in Arabic** and a **random background** (from 5), using the same S3/MinIO setup for backgrounds. Ramadan start date: **17 February 2025**.
+
+- **Quran API**: [quranapi.pages.dev](https://quranapi.pages.dev/) — no auth, no rate limit. Verses are fetched at random (surah + ayah).
+- **Backgrounds**: One of 5 backgrounds is chosen at random. Same S3 bucket/credentials as weather; keys are `backgrounds/1.mp4` … `backgrounds/5.mp4`. Upload 5 background videos to S3 under those names.
+
+### Run Ramadan video
+
+```bash
+python3 ramadan_video.py
+```
+
+Output: `ramadan_vandaag.mp4` (Arabic verse overlay, Dutch intro voice + subtitles, optional avatar, random background).
+
+To disable Discord posting:
+```bash
+python3 ramadan_video.py --no-discord
+```
+
+### Ramadan config
+
+- **Start date**: Script only runs on or after 17 February 2025 (configurable in `ramadan_video.py`: `RAMADAN_START_DATE`).
+- **Music**: Looks for `music/ramadan.mp3`, then `music/normal.mp3`.
+- **Discord**: Uses `RAMADAN_DISCORD_WEBHOOK_URL` if set, otherwise `DISCORD_WEBHOOK_URL`.
+
+### Run at sunrise and sundown during Ramadan
+
+To post the video **at sunrise and sundown** for the whole of Ramadan, use the scheduler:
+
+```bash
+pip install astral
+python3 ramadan_scheduler.py
+```
+
+The scheduler uses your location (default: Amsterdam) to compute sunrise/sunset and runs `ramadan_video.py` twice per day.
+
+**Ubuntu / Linux:** One-command setup: `chmod +x setup_ubuntu.sh && ./setup_ubuntu.sh` (installs deps, venv, systemd service). See **[RAMADAN_SCHEDULING.md](RAMADAN_SCHEDULING.md)** for details and macOS.
+
+---
+
 ## Configuration
 
 You can modify these settings at the top of `weather_video.py`:

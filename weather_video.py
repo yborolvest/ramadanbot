@@ -108,6 +108,9 @@ S3_SECRET_KEY = os.environ.get("S3_SECRET_KEY")  # required for MinIO
 S3_USE_SSL = os.environ.get("S3_USE_SSL", "true").lower() == "true"
 ENABLE_S3_BACKGROUNDS = os.environ.get("ENABLE_S3_BACKGROUNDS", "true").lower() == "true"
 
+# Ramadan: 5 background names (S3 key basename: backgrounds/1.mp4 ... backgrounds/5.mp4)
+RAMADAN_BACKGROUND_NAMES = ["1", "2", "3", "4", "5"]
+
 
 # ---------- WEATHER ----------
 
@@ -2099,13 +2102,14 @@ def create_video(slide_img, voice_file, music_file, forecast_text, temp_c, condi
 
 # ---------- DISCORD POSTING ----------
 
-def post_to_discord(video_path, webhook_url=None):
+def post_to_discord(video_path, webhook_url=None, content=None):
     """
     Post the generated video to Discord using a webhook.
     
     Args:
         video_path: Path to the video file to upload
         webhook_url: Discord webhook URL (or set DISCORD_WEBHOOK_URL env var)
+        content: Optional message text (default: weather forecast message)
     
     Returns:
         True if successful, False otherwise
@@ -2135,7 +2139,7 @@ def post_to_discord(video_path, webhook_url=None):
         time_str = now.strftime("%H:%M")
         
         # Prepare the message
-        message = f"🌤️ Weersverwachting - {now.strftime('%d %B %Y')} om {time_str}"
+        message = content if content is not None else f"🌤️ Weersverwachting - {now.strftime('%d %B %Y')} om {time_str}"
         
         # Upload file to Discord webhook
         with open(video_path, 'rb') as video_file:
